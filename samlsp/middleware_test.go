@@ -17,7 +17,6 @@ import (
 	"testing"
 	"time"
 
-	"github.com/golang-jwt/jwt/v4"
 	dsig "github.com/russellhaering/goxmldsig"
 	"gotest.tools/assert"
 	is "gotest.tools/assert/cmp"
@@ -55,7 +54,6 @@ func NewMiddlewareTest(t *testing.T) *MiddlewareTest {
 		rv, _ := time.Parse("Mon Jan 2 15:04:05.999999999 MST 2006", "Mon Dec 1 01:57:09.123456789 UTC 2015")
 		return rv
 	}
-	jwt.TimeFunc = saml.TimeNow
 	saml.Clock = dsig.NewFakeClockAt(saml.TimeNow())
 	saml.RandReader = &testRandomReader{}
 
@@ -281,10 +279,10 @@ func TestMiddlewareRequireAccountBadCreds(t *testing.T) {
 
 func TestMiddlewareRequireAccountExpiredCreds(t *testing.T) {
 	test := NewMiddlewareTest(t)
-	jwt.TimeFunc = func() time.Time {
-		rv, _ := time.Parse("Mon Jan 2 15:04:05 UTC 2006", "Mon Dec 1 01:31:21 UTC 2115")
-		return rv
-	}
+	// jwt.TimeFunc = func() time.Time {
+	// 	rv, _ := time.Parse("Mon Jan 2 15:04:05 UTC 2006", "Mon Dec 1 01:31:21 UTC 2115")
+	// 	return rv
+	// }
 
 	handler := test.Middleware.RequireAccount(
 		http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
