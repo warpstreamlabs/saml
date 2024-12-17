@@ -7,6 +7,7 @@ import (
 	"net/http"
 	"net/url"
 
+	"github.com/golang-jwt/jwt/v5"
 	dsig "github.com/russellhaering/goxmldsig"
 
 	"github.com/crewjam/saml"
@@ -16,6 +17,7 @@ import (
 type Options struct {
 	EntityID              string
 	URL                   url.URL
+	JWTSigningMethod      jwt.SigningMethod
 	Key                   *rsa.PrivateKey
 	Certificate           *x509.Certificate
 	Intermediates         []*x509.Certificate
@@ -36,13 +38,19 @@ type Options struct {
 // DefaultSessionCodec returns the default SessionCodec for the provided options,
 // a JWTSessionCodec configured to issue signed tokens.
 func DefaultSessionCodec(opts Options) JWTSessionCodec {
-	return JWTSessionCodec{
+	sc := JWTSessionCodec{
 		SigningMethod: defaultJWTSigningMethod,
 		Audience:      opts.URL.String(),
 		Issuer:        opts.URL.String(),
 		MaxAge:        defaultSessionMaxAge,
 		Key:           opts.Key,
 	}
+
+	if opts.JWTSigningMethod != nil {
+		sc.SigningMethod = opts.JWTSigningMethod
+	}
+
+	return sc
 }
 
 // DefaultSessionProvider returns the default SessionProvider for the provided options,
@@ -66,13 +74,19 @@ func DefaultSessionProvider(opts Options) CookieSessionProvider {
 // DefaultTrackedRequestCodec returns a new TrackedRequestCodec for the provided
 // options, a JWTTrackedRequestCodec that uses a JWT to encode TrackedRequests.
 func DefaultTrackedRequestCodec(opts Options) JWTTrackedRequestCodec {
-	return JWTTrackedRequestCodec{
+	trc := JWTTrackedRequestCodec{
 		SigningMethod: defaultJWTSigningMethod,
 		Audience:      opts.URL.String(),
 		Issuer:        opts.URL.String(),
 		MaxAge:        saml.MaxIssueDelay,
 		Key:           opts.Key,
 	}
+
+	if opts.JWTSigningMethod != nil {
+		trc.SigningMethod = opts.JWTSigningMethod
+	}
+
+	return trc
 }
 
 // DefaultRequestTracker returns a new RequestTracker for the provided options,
