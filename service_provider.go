@@ -4,7 +4,7 @@ import (
 	"bytes"
 	"compress/flate"
 	"context"
-	"crypto/rsa"
+	"crypto"
 	"crypto/tls"
 	"crypto/x509"
 	"encoding/base64"
@@ -67,7 +67,7 @@ type ServiceProvider struct {
 	EntityID string
 
 	// Key is the RSA private key we use to sign requests.
-	Key *rsa.PrivateKey
+	Key crypto.Signer
 
 	// Certificate is the RSA public part of Key.
 	Certificate   *x509.Certificate

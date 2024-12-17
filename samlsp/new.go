@@ -2,7 +2,7 @@
 package samlsp
 
 import (
-	"crypto/rsa"
+	"crypto"
 	"crypto/x509"
 	"net/http"
 	"net/url"
@@ -18,7 +18,7 @@ type Options struct {
 	EntityID              string
 	URL                   url.URL
 	JWTSigningMethod      jwt.SigningMethod
-	Key                   *rsa.PrivateKey
+	Key                   crypto.Signer
 	Certificate           *x509.Certificate
 	Intermediates         []*x509.Certificate
 	HTTPClient            *http.Client
